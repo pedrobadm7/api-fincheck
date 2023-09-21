@@ -10,7 +10,7 @@ export class ValidateBankaccountOwnerShipService {
 
   async validate(userId: string, bankAccountId: string) {
     const isOwner = await this.bankAccountsRepositories.findFirst({
-      where: { userId, id: bankAccountId },
+      where: { id: bankAccountId, userId },
     });
 
     if (!isOwner) {
