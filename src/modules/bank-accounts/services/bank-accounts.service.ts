@@ -4,6 +4,7 @@ import { BankAccountsRepository } from 'src/shared/database/repositories/bank-ac
 import { CreateBankAccountDto } from '../dto/create-bank-account.dto';
 import { UpdateBankAccountDto } from '../dto/update-bank-account.dto';
 import { ValidateBankaccountOwnerShipService } from './validate-bank-account-ownership.service';
+import { TransactionType } from 'src/modules/transactions/entities/Transaction';
 
 @Injectable()
 export class BankAccountsService {
@@ -26,11 +27,36 @@ export class BankAccountsService {
     });
   }
 
-  findAllByUserId(userId: string) {
-    return this.bankAccountsRepositories.findMany({
-      where: {
-        userId,
+  async findAllByUserId(userId: string) {
+    const bankAccounts = await this.bankAccountsRepositories.findMany({
+      where: { userId },
+      include: {
+        transactions: {
+          select: {
+            type: true,
+            value: true,
+          },
+        },
       },
+    });
+
+    return bankAccounts.map(({ transactions, ...bankAccount }) => {
+      const totalTransactions = transactions.reduce(
+        (acc, transaction) =>
+          acc +
+          (transaction.type === TransactionType.INCOME
+            ? transaction.value
+            : -transaction.value),
+        0,
+      );
+
+      const currentBalance = bankAccount.initialBalance + totalTransactions;
+
+      return {
+        ...bankAccount,
+        currentBalance,
+        transactions,
+      };
     });
   }
 
