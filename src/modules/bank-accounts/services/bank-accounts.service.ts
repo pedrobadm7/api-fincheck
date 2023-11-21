@@ -11,7 +11,7 @@ export class BankAccountsService {
   constructor(
     private readonly bankAccountsRepositories: BankAccountsRepository,
     private readonly validateBankAccountOwnershipService: ValidateBankaccountOwnerShipService,
-  ) {}
+  ) { }
 
   create(userId: string, createBankAccountDto: CreateBankAccountDto) {
     const { name, color, initialBalance, type } = createBankAccountDto;
@@ -55,7 +55,6 @@ export class BankAccountsService {
       return {
         ...bankAccount,
         currentBalance,
-        transactions,
       };
     });
   }
