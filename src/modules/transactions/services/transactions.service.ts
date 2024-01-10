@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Injectable } from '@nestjs/common';
 import { ValidateBankaccountOwnerShipService } from 'src/modules/bank-accounts/services/validate-bank-account-ownership.service';
 import { ValidateCategoryOwnerShipService } from 'src/modules/categories/services/validate-category-ownership.service';
@@ -55,6 +56,15 @@ export class TransactionsService {
           lt: new Date(Date.UTC(filters.year, filters.month + 1)),
         },
       },
+      include: {
+        category: {
+          select: {
+            id: true,
+            name: true,
+            icon: true,
+          },
+        },
+      },
     });
   }
 
@@ -106,17 +116,17 @@ export class TransactionsService {
   }) {
     await Promise.all([
       transactionId &&
-        this.validateTransactionOwnerShipService.validate(
-          userId,
-          transactionId,
-        ),
+      this.validateTransactionOwnerShipService.validate(
+        userId,
+        transactionId,
+      ),
       bankAccountId &&
-        this.validateBankAccountOwnershipService.validate(
-          userId,
-          bankAccountId,
-        ),
+      this.validateBankAccountOwnershipService.validate(
+        userId,
+        bankAccountId,
+      ),
       categoryId &&
-        this.validateCategoryOwnerShipService.validate(userId, categoryId),
+      this.validateCategoryOwnerShipService.validate(userId, categoryId),
     ]);
   }
 }
